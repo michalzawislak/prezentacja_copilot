@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GitHub Copilot dla Angular Developerów – Deep Dive 2026</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/theme/black.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/highlight/monokai.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --accent: #DD0031;
+      --accent-light: #FF4081;
+      --bg-dark: #1a1a2e;
+      --bg-card: rgba(255,255,255,0.05);
+      --text-muted: #9ca3af;
+    }
+
+    .reveal {
+      font-family: 'Inter', sans-serif;
+    }
+
+    .reveal h1, .reveal h2, .reveal h3 {
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      text-transform: none;
+      letter-spacing: -0.02em;
+    }
+
+    .reveal h1 { font-size: 2.4em; }
+    .reveal h2 { font-size: 1.6em; margin-bottom: 0.6em; }
+    .reveal h3 { font-size: 1.1em; color: var(--accent-light); }
+
+    .reveal p, .reveal li {
+      font-weight: 300;
+      line-height: 1.6;
+      font-size: 0.85em;
+    }
+
+    .reveal ul { list-style: none; padding-left: 0; }
+
+    .reveal ul li {
+      position: relative;
+      padding-left: 1.4em;
+      margin-bottom: 0.5em;
+    }
+
+    .reveal ul li::before {
+      content: '▸';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .reveal code {
+      font-family: 'JetBrains Mono', monospace;
+      background: rgba(221,0,49,0.15);
+      padding: 0.1em 0.4em;
+      border-radius: 4px;
+      font-size: 0.9em;
+      color: var(--accent-light);
+    }
+
+    .reveal pre code {
+      background: rgba(0,0,0,0.4);
+      color: #e2e8f0;
+      padding: 1em;
+      border-radius: 8px;
+      font-size: 0.7em;
+      line-height: 1.5;
+      border-left: 3px solid var(--accent);
+    }
+
+    .title-slide h1 {
+      font-size: 2.6em;
+      background: linear-gradient(135deg, #fff 0%, var(--accent-light) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .title-slide .subtitle {
+      font-size: 1.1em;
+      color: var(--text-muted);
+      font-weight: 300;
+      margin-top: 0.5em;
+    }
+
+    .badge {
+      display: inline-block;
+      background: var(--accent);
+      color: white;
+      padding: 0.2em 0.7em;
+      border-radius: 20px;
+      font-size: 0.55em;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      vertical-align: middle;
+      margin-left: 0.3em;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2em;
+      text-align: left;
+    }
+
+    .three-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1em;
+      text-align: left;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 0.8em 1em;
+    }
+
+    .card h3 {
+      margin-top: 0;
+      margin-bottom: 0.25em;
+      font-size: 0.95em;
+    }
+
+    .card p, .card li {
+      font-size: 0.72em;
+      color: var(--text-muted);
+    }
+
+    .highlight-box {
+      background: linear-gradient(135deg, rgba(221,0,49,0.1), rgba(255,64,129,0.05));
+      border: 1px solid rgba(221,0,49,0.3);
+      border-radius: 12px;
+      padding: 1em 1.5em;
+      margin: 0.8em 0;
+    }
+
+    .emoji-icon {
+      font-size: 1.2em;
+      margin-bottom: 0.15em;
+      display: block;
+    }
+
+    .reveal .slide-number {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--accent);
+    }
+
+    .section-label {
+      font-size: 0.6em;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 0.3em;
+    }
+
+    .reveal .progress span {
+      background: var(--accent);
+    }
+
+    .key-point {
+      font-size: 1.1em !important;
+      font-weight: 400 !important;
+      color: #e2e8f0;
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .reveal blockquote {
+      background: var(--bg-card);
+      border-left: 4px solid var(--accent);
+      padding: 0.8em 1.2em;
+      font-style: italic;
+      width: auto;
+      margin: 1em auto;
+      font-size: 0.85em;
+    }
+
+    .tag {
+      display: inline-block;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      padding: 0.15em 0.5em;
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8em;
+      margin: 0.15em;
+    }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- SLIDE 1: Tytuł -->
+      <section class="title-slide" data-background-gradient="radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a14 100%)">
+        <h1>GitHub Copilot<br>dla Angular Developerów</h1>
+        <p class="subtitle">Deep Dive 2026 — od autouzupełniania do AI Orchestration</p>
+        <aside class="notes">
+          Cześć wszystkim! Dzisiaj porozmawiamy o GitHub Copilot w kontekście codziennej pracy z Angularem. Nie będzie to typowe demo z efektem wow – wejdziemy głęboko w praktyczne techniki, tryby pracy i strategie promptingu, które realnie zmieniają naszą produktywność. Zaczynajmy.
+        </aside>
+      </section>
+
+      <!-- SLIDE 2: Programowanie AI-Native -->
+      <section data-background-gradient="radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a14 100%)">
+        <p class="section-label">Wstęp</p>
+        <h2>Programowanie AI-Native w 2026</h2>
+        <ul>
+          <li><strong>AI Orchestration</strong> — przejście od pisania kodu ręcznie do kierowania modelami AI</li>
+          <li><strong>Angular i przewidywalność</strong> — rygorystyczna struktura <code>.ts</code> <code>.html</code> <code>.css</code> <code>.spec.ts</code> ułatwia Copilotowi zrozumienie intencji</li>
+          <li><strong>Kontekst frameworka</strong> — konwencje nazewnictwa i separacja odpowiedzialności działają na korzyść AI</li>
+        </ul>
+        <aside class="notes">
+          W 2026 roku mówimy już o programowaniu AI-native. Zamiast pisać każdą linijkę kodu ręcznie, kierujemy modelami AI – podajemy im kontekst, intencje i oczekiwania, a one generują kod. Angular jest tutaj w świetnej pozycji, bo ma bardzo przewidywalną strukturę – osobne pliki na TypeScript, szablon HTML, style i testy. Copilot dzięki temu znacznie łatwiej rozpoznaje, nad czym pracujemy i co chcemy osiągnąć. Konwencje nazewnictwa w Angularze, takie jak sufiksy .component, .service czy .pipe, dodatkowo pomagają modelowi w zrozumieniu kontekstu.
+        </aside>
+      </section>
+
+      <!-- SLIDE 3: Tryby pracy -->
+      <section data-background-gradient="radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a14 100%)">
+        <p class="section-label">Tryby pracy</p>
+        <h2>Ask, Edit i Agent Mode</h2>
+        <div class="three-col">
+          <div class="card">
+            <span class="emoji-icon">💬</span>
+            <h3>Ask (Chat)</h3>
+            <p>Szybkie konsultacje i pytania w czacie. Idealne do wyjaśniania kodu, operatorów RxJS czy strategii Change Detection.</p>
+          </div>
+          <div class="card">
+            <span class="emoji-icon">✏️</span>
+            <h3>Edit <span class="badge">Ctrl+I</span></h3>
+            <p>Modyfikacja kodu inline – zaznaczasz fragment i opisujesz zmianę. Np. dodanie walidacji do formularza.</p>
+          </div>
+          <div class="card">
+            <span class="emoji-icon">🤖</span>
+            <h3>Agent Mode</h3>
+            <p>Copilot jako samodzielny wykonawca – planuje zmiany, tworzy pliki i aktualizuje importy w całym projekcie.</p>
+          </div>
+        </div>
+        <aside class="notes">
+          Copilot w VS Code oferuje trzy główne tryby pracy. Ask to klasyczny czat – zadajesz pytania, dostajesz odpowiedzi. Świetny do szybkich konsultacji, na przykład „wyjaśnij mi ten operator RxJS" albo „jak zoptymalizować Change Detection". Edit to tryb edycji inline – zaznaczasz kod, wciskasz Ctrl+I i opisujesz, co chcesz zmienić. Na przykład „dodaj walidację email do tego formularza". A Agent Mode to game changer – Copilot samodzielnie analizuje projekt, planuje zmiany w wielu plikach, tworzy nowe pliki i aktualizuje importy. Idealny przy tworzeniu kompletnego modułu funkcjonalnego od zera.
+        </aside>
+      </section>
+
+      <!-- SLIDE 4: Uczestnicy czatu (@) -->
+      <section data-background-gradient="radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a14 100%)">
+        <p class="section-label">Eksperci domenowi</p>
+        <h2>Uczestnicy czatu <code>@</code></h2>
+        <p class="key-point" style="margin-bottom: 1em;">Nie pytaj „wszystkich" — pytaj specjalistów</p>
+        <div class="three-col">
+          <div class="card">
+            <h3>@workspace</h3>
+            <p>Pełna wiedza o strukturze projektu — od <code>angular.json</code> po najgłębiej zagnieżdżone serwisy.</p>
+          </div>
+          <div class="card">
+            <h3>@vscode</h3>
+            <p>Specjalista od środowiska — konfiguracja edytora, pluginy, ustawienia debuggera.</p>
+          </div>
+          <div class="card">
+            <h3>@terminal</h3>
+            <p>Tworzenie i naprawianie komend CLI, np. <code>ng generate</code> z odpowiednimi flagami.</p>
+          </div>
+        </div>
+        <aside class="notes">
+          Zamiast pytać Copilota ogólnie „o wszystko", możemy kierować pytania do konkretnych ekspertów. @workspace ma pełną wiedzę o strukturze naszego projektu – zna angular.json, konfigurację routingu i każdy zagnieżdżony serwis. @vscode pomoże skonfigurować edytor, zainstalować plugin albo znaleźć problem w ustawieniach. A @terminal jest specjalistą od komend w konsoli – możemy go poprosić o wygenerowanie komendy ng generate z flagami OnPush i odpowiednim folderem docelowym. Kluczowa zasada: im precyzyjniej wskażemy eksperta, tym lepszą odpowiedź dostaniemy.
+        </aside>
+      </section>
+
+      <!-- SLIDE 5: Zmienne czatu (#) -->
+      <section data-background-gradient="radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a14 100%)">
+        <p class="section-label">Precyzyjny kontekst</p>
+        <h2>Zmienne czatu <code>#</code></h2>
+        <div class="two-col">
+          <div>
+            <ul>
+              <li><code>#selection</code> — zaznaczony fragment kodu</li>
+              <li><code>#file</code> — wskazanie konkretnego pliku</li>
+              <li><code>#editor</code> — zawartość aktywnego edytora</li>
+            </ul>
+          </div>
+          <div>
+            <ul>
+              <li><code>#codebase</code> — przeszukanie całego projektu</li>
+              <li><code>#terminalSelection</code> — treść błędu z terminala</li>
+              <li><code>#changes</code> — aktualne zmiany w repozytorium</li>
+            </ul>
+          </div>
+        </div>
+        <div class="highlight-box" style="margin-top: 1em;">
+          <p style="margin: 0; text-align: center;">Przykład: <code>Stwórz test jednostkowy na podstawie #file:user.service.ts</code></p>
+        </div>
+        <aside class="notes">
+          Zmienne czatu pozwalają precyzyjnie wskazać Copilotowi, na czym ma się skupić. #selection to zaznaczony fragment kodu – idealny do refaktoryzacji konkretnej metody. #file pozwala wskazać plik, na przykład „stwórz test na podstawie #file:user.service.ts". #editor daje kontekst tego, co aktualnie widzimy w edytorze. #codebase przeszukuje cały projekt w poszukiwaniu wzorców i powiązań. #terminalSelection pozwala przekazać treść błędu z terminala, żeby natychmiast uzyskać propozycję naprawy. A #changes dodaje kontekst aktualnych zmian w repozytorium. Te zmienne to kluczowy element efektywnej pracy z Copilotem.
+        </aside>
+      </section>
+
+      <!-- SLIDE 6: Angular 2026 -->
+      <section data-background-gradient="radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a14 100%)">
+        <p class="section-label">Angular 2026</p>
+        <h2>Signals, inject() i Standalone</h2>
+        <div class="two-col">
+          <div>
+            <ul>
+              <li><strong>Signals</strong> — reaktywność bez RxJS boilerplate'u. Copilot pomaga migrować <code>BehaviorSubject</code> → <code>signal()</code></li>
+              <li><strong>inject()</strong> — DI bez konstruktora, czystszy i łatwiejszy do testowania kod</li>
+              <li><strong>Standalone</strong> — komponenty bez <code>NgModule</code>, mniej ceremonii</li>
+            </ul>
+          </div>
+          <div>
+            <pre><code data-trim data-noescape class="language-typescript">
+// Przed (RxJS)
+private count$ = new BehaviorSubject(0);
+
+// Po (Signals)
+count = signal(0);
+
+// Aktualizacja
+this.count.update(v => v + 1);
+            </code></pre>
+          </div>
+        </div>
+        <aside class="notes">
+          Angular w 2026 roku opiera się na trzech filarach: Signals, funkcji inject i Standalone Components. Signals to natywny system reaktywności – zastępują BehaviorSubjecty w wielu scenariuszach, eliminując boilerplate RxJS. Copilot doskonale wspiera taką migrację – wystarczy mu pokazać istniejący kod i poprosić o bezpieczną konwersję. Funkcja inject zastępuje wstrzykiwanie zależności przez konstruktor – kod jest czystszy, bardziej czytelny i łatwiejszy do testowania. A Standalone Components to dzisiaj standard – generujemy komponenty bez zbędnych NgModule, co upraszcza architekturę aplikacji.
+        </aside>
+      </section>
+
+      <!-- SLIDE 7: Automatyzacja testów -->
+      <section data-background-gradient="radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a14 100%)">
+        <p class="section-label">Testowanie</p>
+        <h2>Automatyzacja testów jednostkowych</h2>
+        <div class="three-col">
+          <div class="card">
+            <span class="emoji-icon">⚡</span>
+            <h3>Instant TestBed</h3>
+            <p>Generowanie kompletnych plików <code>.spec.ts</code> z poprawną konfiguracją modułów testowych i providerów.</p>
+          </div>
+          <div class="card">
+            <span class="emoji-icon">🎭</span>
+            <h3>Mocki na żądanie</h3>
+            <p>Automatyczne tworzenie mocków serwisów na podstawie ich interfejsów i definicji typów.</p>
+          </div>
+          <div class="card">
+            <span class="emoji-icon">🔍</span>
+            <h3>Edge Cases</h3>
+            <p>Generowanie testów brzegowych — pusta lista, błąd HTTP 500, timeout, brak uprawnień.</p>
+          </div>
+        </div>
+        <aside class="notes">
+          Copilot potrafi wygenerować kompletny plik testowy z poprawną konfiguracją TestBed – łącznie z importami, providerami i deklaracjami. Potrafi też stworzyć mocki nawet skomplikowanych serwisów na podstawie ich interfejsów i typów. Co szczególnie cenne – możemy go poprosić o testy brzegowych przypadków: pusta lista, błąd 500 z API, timeout czy brak uprawnień. To scenariusze, które ręcznie łatwo przeoczyć, a Copilot wygeneruje je w kilka sekund. Pamiętajcie jednak, żeby zawsze zweryfikować wygenerowane testy – model może nie znać specyfiki waszego środowiska testowego.
+        </aside>
+      </section>
+
+      <!-- SLIDE 8: Prompting – Podstawy -->
+      <section data-background-gradient="radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a14 100%)">
+        <p class="section-label">Techniki promptingu</p>
+        <h2>Podstawy i struktura promptu</h2>
+        <div class="two-col">
+          <div>
+            <ul>
+              <li><strong>Role Prompting</strong> — nadaj AI rolę eksperta: <em>„Jesteś Senior Angular Developerem, ekspertem od RxJS"</em></li>
+              <li><strong>Delimitery</strong> — oddzielaj kod od instrukcji za pomocą <code>###</code> lub tagów XML</li>
+              <li><strong>Kontekst sąsiednich kart</strong> — otwarte pliki w edytorze są brane pod uwagę przez Copilota</li>
+            </ul>
+          </div>
+          <div>
+            <pre><code data-trim data-noescape class="language-xml">
+&lt;context&gt;
+  Komponent listy użytkowników
+  z paginacją server-side
+&lt;/context&gt;
+
+&lt;instructions&gt;
+  Zrefaktoryzuj na Signals
+  z użyciem inject()
+&lt;/instructions&gt;
+            </code></pre>
+          </div>
+        </div>
+        <aside class="notes">
+          Dobry prompt to fundament dobrej odpowiedzi. Role Prompting polega na nadaniu modelowi konkretnej roli – na przykład „jesteś Senior Angular Developerem, ekspertem od RxJS i wydajności". To naprawdę wpływa na jakość generowanego kodu. Delimitery to separatory – używamy ### albo tagów XML, żeby wyraźnie oddzielić nasz kod od instrukcji. Dzięki temu model nie pomyli kontekstu z poleceniem. I ważna rzecz – Copilot bierze pod uwagę otwarte karty w edytorze. Dlatego warto mieć otwarty zarówno plik TypeScript jak i HTML komponentu – model zobaczy oba i lepiej zrozumie kontekst.
+        </aside>
+      </section>
+
+      <!-- SLIDE 9: Zaawansowany prompting -->
+      <section data-background-gradient="radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a14 100%)">
+        <p class="section-label">Zaawansowany prompting</p>
+        <h2>Logika i rozumowanie</h2>
+        <div class="three-col">
+          <div class="card">
+            <h3>Few-Shot</h3>
+            <p>Podaj wzorcowy komponent jako przykład — Copilot wygeneruje kolejne w identycznym stylu, wymuszając spójność projektu.</p>
+          </div>
+          <div class="card">
+            <h3>Step-Back</h3>
+            <p><em>„Najpierw opisz strategię zarządzania stanem, a potem napisz implementację"</em> — wymuszenie analizy przed kodem.</p>
+          </div>
+          <div class="card">
+            <h3>Least-to-Most</h3>
+            <p>Rozbij złożone zadanie na kroki: uwierzytelnianie → sesja płatności → obsługa webhooków.</p>
+          </div>
+        </div>
+        <aside class="notes">
+          Teraz zaawansowane techniki. Few-Shot Prompting to podanie modelowi jednego lub dwóch wzorcowych przykładów przed wygenerowaniem kolejnych. Pokazujemy komponent, który odpowiada naszym standardom, i prosimy o kolejne w tym samym stylu. To wymusza spójność w całym projekcie. Step-Back to technika, w której najpierw prosimy model o opisanie strategii, a dopiero potem o napisanie kodu. Na przykład „najpierw opisz strategię zarządzania stanem dla tego modułu, potem napisz implementację". Dzięki temu dostajemy przemyślane rozwiązanie zamiast pierwszego lepszego kodu. Least-to-Most to rozbijanie złożonych zadań na małe kroki logiczne – zamiast prosić o całą integrację, dzielimy ją na logiczne etapy.
+        </aside>
+      </section>
+
+      <!-- SLIDE 10: ToT i CoVe -->
+      <section data-background-gradient="radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a14 100%)">
+        <p class="section-label">Autokorekta i jakość</p>
+        <h2 style="margin-bottom: 0.3em;">Tree of Thought i Chain of Verification</h2>
+        <div class="two-col" style="gap: 1.5em;">
+          <div>
+            <ul style="font-size: 0.82em;">
+              <li><strong>Tree of Thought</strong> — wygeneruj kilka alternatywnych podejść i uzasadnij wybór najlepszego</li>
+              <li><strong>Self-Refine</strong> — poproś model o sprawdzenie własnego kodu, np. pod kątem wycieków pamięci w RxJS</li>
+              <li><strong>Chain of Verification</strong> — model generuje odpowiedź, a następnie tworzy listę kontrolną zgodności z API frameworka</li>
+            </ul>
+          </div>
+          <div>
+            <div class="highlight-box" style="padding: 0.7em 1em;">
+              <p style="margin: 0; font-size: 0.72em;"><strong>Przykład ToT:</strong></p>
+              <p style="margin: 0.3em 0 0; font-size: 0.65em; font-style: italic;">„Zaproponuj 3 podejścia do zarządzania stanem: NGRX, Component Store i Signals. Porównaj trade-offy i uzasadnij rekomendację."</p>
+            </div>
+            <div class="highlight-box" style="margin-top: 0.6em; padding: 0.7em 1em;">
+              <p style="margin: 0; font-size: 0.72em;"><strong>Przykład CoVe:</strong></p>
+              <p style="margin: 0.3em 0 0; font-size: 0.65em; font-style: italic;">„Wygeneruj odpowiedź, a potem zweryfikuj, czy użyte API Angulara jest kompatybilne z wersją 19+."</p>
+            </div>
+          </div>
+        </div>
+        <aside class="notes">
+          Trzy potężne techniki kontroli jakości. Tree of Thought to polecenie modelowi wygenerowania kilku alternatywnych rozwiązań – na przykład „zaproponuj trzy podejścia do zarządzania stanem: NGRX, Component Store i Signals, porównaj ich trade-offy i uzasadnij rekomendację". Dzięki temu dostajemy przemyślaną analizę zamiast jednego domyślnego rozwiązania. Self-Refine to prośba o sprawdzenie własnego kodu – na przykład „sprawdź ten kod pod kątem wycieków pamięci w RxJS i zaproponuj poprawioną wersję". A Chain of Verification to technika, w której model generuje odpowiedź, a następnie tworzy listę kontrolną – na przykład weryfikuje, czy wszystkie użyte metody Angulara faktycznie istnieją w wersji 19 i nowszej.
+        </aside>
+      </section>
+
+      <!-- SLIDE 11: Custom Instructions -->
+      <section data-background-gradient="radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a14 100%)">
+        <p class="section-label">Personalizacja</p>
+        <h2>Custom Instructions</h2>
+        <div class="two-col">
+          <div>
+            <ul>
+              <li>Plik <code>.github/copilot-instructions.md</code> w repozytorium</li>
+              <li>Automatycznie dołączany do każdego zapytania Copilota</li>
+              <li>Definiuje standardy i konwencje zespołu</li>
+            </ul>
+          </div>
+          <div>
+            <pre><code data-trim data-noescape class="language-markdown">
+# Copilot Instructions
+
+- Używaj Tailwind CSS, nie pisz SCSS
+- Stosuj ChangeDetection.OnPush
+- Preferuj Signals zamiast RxJS
+- Testy pisz w formacie AAA
+  (Arrange, Act, Assert)
+- Komponenty zawsze Standalone
+            </code></pre>
+          </div>
+        </div>
+        <aside class="notes">
+          Custom Instructions to nasz osobisty style guide dla Copilota. Tworzymy plik .github/copilot-instructions.md w repozytorium i definiujemy w nim zasady obowiązujące w projekcie. Na przykład „zawsze używaj Tailwind CSS", „stosuj strategię OnPush", „preferuj Signals zamiast RxJS", „testy pisz w formacie Arrange-Act-Assert". Ten plik jest automatycznie dołączany do każdego zapytania – dzięki temu Copilot od razu zna nasze konwencje i nie musimy ich powtarzać za każdym razem. To szczególnie przydatne w zespołach, gdzie chcemy wymusić spójność kodu.
+        </aside>
+      </section>
+
+      <!-- SLIDE 12: MCP -->
+      <section data-background-gradient="radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a14 100%)">
+        <p class="section-label">Rozszerzalność</p>
+        <h2>Model Context Protocol (MCP)</h2>
+        <ul>
+          <li><strong>Wiedza korporacyjna</strong> — połącz Copilota z wewnętrznym Storybookiem, Confluence czy Swaggerem</li>
+          <li><strong>Context Bridge</strong> — dynamiczne dostarczanie wiedzy spoza danych treningowych modelu</li>
+          <li><strong>Wewnętrzne biblioteki</strong> — Copilot poznaje komponenty i API, których nie ma w publicznym internecie</li>
+        </ul>
+        <div class="highlight-box" style="margin-top: 1em;">
+          <p style="margin: 0; text-align: center; font-size: 0.8em;">MCP = most między Copilotem a Twoją wewnętrzną dokumentacją</p>
+        </div>
+        <aside class="notes">
+          Model Context Protocol to sposób na rozszerzenie wiedzy Copilota o nasze wewnętrzne zasoby. Możemy połączyć go ze Storybookiem, dokumentacją w Confluence, specyfikacją API w Swaggerze czy z naszymi wewnętrznymi bibliotekami komponentów. MCP działa jak most kontekstowy – dynamicznie dostarcza informacje, których model nie miał w trakcie treningu. W praktyce oznacza to, że Copilot może znać nasze własne komponenty UI, wewnętrzne API i standardy architektoniczne. To kluczowe w środowiskach korporacyjnych, gdzie większość wiedzy jest wewnętrzna i niedostępna publicznie.
+        </aside>
+      </section>
+
+      <!-- SLIDE 13: Porównanie modeli -->
+      <section data-background-gradient="radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a14 100%)">
+        <p class="section-label">Wybór silnika</p>
+        <h2>Porównanie modeli AI w Copilot</h2>
+        <div class="three-col" style="font-size: 0.75em; gap: 1em;">
+          <div class="card" style="padding: 0.8em;">
+            <h3 style="margin-bottom: 0.3em;">Rozumowanie</h3>
+            <ul style="margin: 0;">
+              <li><strong>Claude Sonnet 4.6</strong> — refaktoryzacja, logika biznesowa, testy</li>
+              <li><strong>Claude Opus 4.6</strong> — najgłębsza analiza, złożone zadania</li>
+              <li><strong>GPT-5.4</strong> — rozumowanie na najwyższym poziomie</li>
+            </ul>
+          </div>
+          <div class="card" style="padding: 0.8em;">
+            <h3 style="margin-bottom: 0.3em;">Szybkość</h3>
+            <ul style="margin: 0;">
+              <li><strong>GPT-5 mini</strong> — szybkie pytania, boilerplate (0 premium)</li>
+              <li><strong>Claude Haiku 4.5</strong> — lekki model, niski koszt</li>
+              <li><strong>Grok Code Fast 1</strong> — najniższe opóźnienie</li>
+            </ul>
+          </div>
+          <div class="card" style="padding: 0.8em;">
+            <h3 style="margin-bottom: 0.3em;">Kod</h3>
+            <ul style="margin: 0;">
+              <li><strong>GPT-5.3-Codex</strong> — zoptymalizowany pod generowanie kodu</li>
+              <li><strong>Gemini 2.5 Pro</strong> — multimodalne wejście</li>
+              <li><strong>GPT-5.4 mini</strong> — szybki kod, niski koszt</li>
+            </ul>
+          </div>
+        </div>
+        <p class="key-point" style="margin-top: 0.6em; font-size: 0.8em !important;">Copilot Auto automatycznie dobiera model — lub wybierz ręcznie</p>
+        <aside class="notes">
+          Copilot w 2026 wspiera kilkanaście modeli AI od różnych dostawców. W kategorii rozumowania mamy Claude Sonnet 4.6, który świetnie radzi sobie z refaktoryzacją, logiką biznesową i testami. Claude Opus 4.6 to najmocniejszy model – idealny do najzłożniejszych zadań, ale droższy w użyciu. GPT-5.4 od OpenAI to ich flagowy model z silnym rozumowaniem. Jeśli zależy nam na szybkości, GPT-5 mini jest darmowy w ramach premium requestów i idealny do prostych pytań. Claude Haiku 4.5 to lekki model Anthropica, a Grok Code Fast 1 od xAI oferuje najniższe opóźnienie. Do generowania kodu mamy dedykowane modele Codex – GPT-5.3-Codex jest zoptymalizowany pod pisanie i edycję kodu. Gemini 2.5 Pro od Google potrafi analizować obrazy i kod jednocześnie. Ważna rzecz: Copilot ma tryb Auto, który sam dobiera najlepszy model do zadania. Ale zawsze możemy wybrać model ręcznie, jeśli wiemy, czego potrzebujemy.
+        </aside>
+      </section>
+
+      <!-- SLIDE 14: Debugging -->
+      <section data-background-gradient="radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a14 100%)">
+        <p class="section-label">Debugging</p>
+        <h2>Debugging i walka z halucynacjami</h2>
+        <div class="three-col">
+          <div class="card">
+            <span class="emoji-icon">🐛</span>
+            <h3>Analiza błędów</h3>
+            <p>Użyj <code>#terminalSelection</code>, żeby przekazać błąd kompilacji Angulara i uzyskać wyjaśnienie z propozycją naprawy.</p>
+          </div>
+          <div class="card">
+            <span class="emoji-icon">🔧</span>
+            <h3>Naprawa inline</h3>
+            <p>Zaznacz błąd w edytorze i użyj <code>/fix</code>, żeby uzyskać natychmiastową propozycję poprawki.</p>
+          </div>
+          <div class="card">
+            <span class="emoji-icon">🛡️</span>
+            <h3>Hallucination Patrol</h3>
+            <p>Stosuj CoVe — weryfikuj, czy model nie zmyślił dekoratora lub operatora RxJS, który nie istnieje.</p>
+          </div>
+        </div>
+        <aside class="notes">
+          Copilot to potężne narzędzie do debugowania. Zaznaczamy treść błędu w terminalu, przekazujemy go przez #terminalSelection i dostajemy analizę z wyjaśnieniem przyczyny i propozycją naprawy. Komenda /fix pozwala na szybkie naprawienie błędu bezpośrednio w edytorze – zaznaczamy problematyczny fragment i Copilot proponuje poprawkę. Ale uwaga na halucynacje – modele AI potrafią zmyślić dekorator lub operator RxJS, który nie istnieje. Dlatego warto stosować Chain of Verification – prosić model o zweryfikowanie, czy użyte API faktycznie istnieje w danej wersji frameworka. Zaufanie jest dobre, weryfikacja lepsza.
+        </aside>
+      </section>
+
+      <!-- SLIDE 15: Dokumentacja i Clean Code -->
+      <section data-background-gradient="radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a14 100%)">
+        <p class="section-label">Jakość kodu</p>
+        <h2>Dokumentacja i Clean Code</h2>
+        <div class="three-col">
+          <div class="card">
+            <span class="emoji-icon">📝</span>
+            <h3>Automatyczne JSDoc</h3>
+            <p>Generowanie opisów metod i parametrów zgodnych ze standardem zespołu.</p>
+          </div>
+          <div class="card">
+            <span class="emoji-icon">📖</span>
+            <h3>Generowanie README</h3>
+            <p>Tworzenie instrukcji obsługi dla nowo powstałych komponentów i bibliotek.</p>
+          </div>
+          <div class="card">
+            <span class="emoji-icon">✅</span>
+            <h3>AI Code Review</h3>
+            <p>Ocena kodu pod kątem czytelności i zasad Clean Code przed wysłaniem Pull Requesta.</p>
+          </div>
+        </div>
+        <aside class="notes">
+          Copilot przyspiesza też pracę nad dokumentacją i jakością kodu. Potrafi wygenerować JSDoc dla metod i parametrów, trzymając się standardu naszego zespołu. Może stworzyć README z instrukcją obsługi dla nowo powstałych komponentów czy bibliotek – wystarczy wskazać pliki źródłowe. A moja ulubiona funkcja to AI Code Review – przed wysłaniem Pull Requesta prosimy Copilota o ocenę kodu pod kątem czytelności, zgodności z zasadami Clean Code i potencjalnych problemów. To jak dodatkowy reviewer, który nigdy nie jest zajęty i zawsze ma czas na dokładne przejrzenie kodu.
+        </aside>
+      </section>
+
+      <!-- SLIDE 16: Bezpieczeństwo -->
+      <section data-background-gradient="radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a14 100%)">
+        <p class="section-label">Enterprise</p>
+        <h2>Bezpieczeństwo i prywatność</h2>
+        <ul>
+          <li><strong>Filtrowanie kodu</strong> — Copilot wykrywa i blokuje fragmenty kodu Open Source objętego restrykcyjnymi licencjami</li>
+          <li><strong>Prywatność danych</strong> — w wersji Business i Enterprise dane nie są wykorzystywane do trenowania modeli publicznych</li>
+          <li><strong>Audyt i kontrola</strong> — logi użycia, kontrola dostępu i zgodność z polityką bezpieczeństwa firmy</li>
+        </ul>
+        <aside class="notes">
+          Na koniec kwestie bezpieczeństwa, które są kluczowe w środowisku korporacyjnym. Copilot ma wbudowane filtry wykrywające fragmenty kodu Open Source objętego restrykcyjnymi licencjami – dzięki temu minimalizujemy ryzyko prawne. W wersji Business i Enterprise nasze dane nie są wykorzystywane do trenowania publicznych modeli AI – kod pozostaje prywatny. Mamy też dostęp do logów użycia i narzędzi kontroli dostępu, co pozwala zachować zgodność z polityką bezpieczeństwa firmy. To ważne argumenty przy przekonywaniu managementu do wdrożenia Copilota w organizacji.
+        </aside>
+      </section>
+
+      <!-- SLIDE 17: Podsumowanie -->
+      <section data-background-gradient="radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a14 100%)">
+        <h2 style="margin-bottom: 0.3em;">Podsumowanie</h2>
+        <div style="text-align: left; max-width: 750px; margin: 0 auto;">
+          <ul style="font-size: 0.9em;">
+            <li><strong>Tryby pracy</strong> — Ask, Edit i Agent pokrywają pełen cykl programowania</li>
+            <li><strong>Kontekst jest kluczem</strong> — <code>@</code> i <code>#</code> precyzują odpowiedzi</li>
+            <li><strong>Prompting to umiejętność</strong> — Few-Shot, ToT, CoVe podnoszą jakość wyników</li>
+            <li><strong>Personalizacja</strong> — Custom Instructions i MCP dostosowują Copilota do zespołu</li>
+            <li><strong>Weryfikacja zawsze</strong> — AI pomaga, ale odpowiedzialność za kod jest nasza</li>
+          </ul>
+        </div>
+        <p style="margin-top: 0.8em; font-size: 1.2em;">Dziękuję — pytania?</p>
+        <aside class="notes">
+          Podsumowując: GitHub Copilot to już nie tylko autouzupełnianie kodu. To pełnoprawny asystent programisty, który rozumie kontekst projektu, wspiera nowoczesne wzorce Angulara i potrafi autonomicznie realizować złożone zadania. Trzy tryby pracy – Ask, Edit i Agent – pokrywają cały cykl programowania. Kluczem do efektywnej pracy jest precyzyjne wskazywanie kontekstu przez @ i # oraz stosowanie zaawansowanych technik promptingu. Custom Instructions i MCP pozwalają dostosować Copilota do potrzeb zespołu. Ale najważniejsze: AI pomaga, lecz to my odpowiadamy za jakość i poprawność kodu. Weryfikacja to obowiązek, nie opcja. Dziękuję za uwagę – jestem otwarty na pytania!
+        </aside>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/notes/notes.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/highlight/highlight.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: 'c/t',
+      transition: 'slide',
+      transitionSpeed: 'default',
+      plugins: [RevealNotes, RevealHighlight],
+      width: 1280,
+      height: 720
+    });
+  </script>
+</body>
+</html>
