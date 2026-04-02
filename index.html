@@ -472,7 +472,101 @@ this.count.update(v => v + 1);
         </aside>
       </section>
 
-      <!-- SLIDE 12: MCP -->
+      <!-- SLIDE 12: Ekosystem .github -->
+      <section data-background-gradient="radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a14 100%)">
+        <p class="section-label" style="margin-bottom: 0;">Ekosystem .github</p>
+        <h2 style="margin-bottom: 0.15em;">Agenci, Prompty, Skille i Hooki</h2>
+        <div class="two-col" style="gap: 0.5em;">
+          <div>
+            <div class="card" style="margin-bottom: 0.35em; padding: 0.35em 0.6em;">
+              <h3 style="margin-bottom: 0.05em;">Custom Agents</h3>
+              <p style="margin: 0 0 0.1em; font-size: 0.58em;"><code>.github/agents/nazwa.agent.md</code></p>
+              <p style="margin: 0; font-size: 0.58em;">Specjaliści z własnym zestawem narzędzi i instrukcjami — np. agent reviewer, agent ds. bezpieczeństwa.</p>
+            </div>
+            <div class="card" style="padding: 0.35em 0.6em;">
+              <h3 style="margin-bottom: 0.05em;">Prompt Files</h3>
+              <p style="margin: 0 0 0.1em; font-size: 0.58em;"><code>.github/prompts/nazwa.prompt.md</code></p>
+              <p style="margin: 0; font-size: 0.58em;">Wielorazowe szablony poleceń wywoływane przez <code>/</code> w czacie — zamiast wklejać prompt z notatnika.</p>
+            </div>
+          </div>
+          <div>
+            <div class="card" style="margin-bottom: 0.35em; padding: 0.35em 0.6em;">
+              <h3 style="margin-bottom: 0.05em;">Agent Skills</h3>
+              <p style="margin: 0 0 0.1em; font-size: 0.58em;"><code>.github/skills/nazwa/SKILL.md</code></p>
+              <p style="margin: 0; font-size: 0.58em;">Instrukcje, skrypty i zasoby ładowane automatycznie, gdy Copilot uzna je za trafne do zadania.</p>
+            </div>
+            <div class="card" style="padding: 0.35em 0.6em;">
+              <h3 style="margin-bottom: 0.05em;">Hooks</h3>
+              <p style="margin: 0 0 0.1em; font-size: 0.58em;"><code>.github/hooks/*.json</code></p>
+              <p style="margin: 0; font-size: 0.58em;">Komendy shell w cyklu życia agenta — np. formatter po edycji, skanowanie sekretów przed commitem.</p>
+            </div>
+          </div>
+        </div>
+        <div class="highlight-box" style="margin-top: 0.3em; padding: 0.3em 0.8em;">
+          <p style="margin: 0; text-align: center; font-size: 0.65em;">Cała konfiguracja wersjonowana w repozytorium — współdzielona z zespołem jak kod</p>
+        </div>
+        <aside class="notes">
+          GitHub Copilot przeszedł ewolucję w stronę modelu agentowego, a folder .github stał się centralnym miejscem zarządzania tymi funkcjami. W poprzednim slajdzie widzieliśmy copilot-instructions.md – to podstawa. Ale ekosystem jest znacznie szerszy. Custom Agents to możliwość tworzenia specjalistów – na przykład agent reviewer z dostępem tylko do odczytu, który ocenia kod, albo agent ds. bezpieczeństwa z własnymi narzędziami. Pliki te tworzymy jako Markdown z konfiguracją narzędzi, modelu i instrukcjami. Prompt Files to biblioteka gotowych, wielorazowych szablonów poleceń. Zamiast kopiować długie prompty, przechowujemy je w repozytorium i wywołujemy przez slash-command w czacie. Mogą mieć zmienne wejściowe i konfigurację YAML. Agent Skills to foldery z instrukcjami i skryptami, które Copilot automatycznie ładuje, gdy uzna je za trafne – na przykład skill do debugowania GitHub Actions albo procedura wdrożeniowa. Hooki to komendy shell uruchamiane deterministycznie w kluczowych momentach pracy agenta – na przykład uruchomienie formattera po każdej edycji pliku albo skanowanie sekretów przed commitem. Co ważne – cała ta konfiguracja żyje w repozytorium, jest wersjonowana razem z kodem i automatycznie współdzielona z zespołem. Większość tych funkcji wymaga najnowszej wersji rozszerzeń GitHub Copilot i GitHub Copilot Chat w VS Code. Część z nich jest jeszcze w Public Preview w JetBrains, Eclipse i Xcode.
+        </aside>
+      </section>
+
+      <!-- SLIDE 13: Przykłady konfiguracji .github -->
+      <section data-background-gradient="radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a14 100%)">
+        <p class="section-label" style="margin-bottom: 0;">Ekosystem .github</p>
+        <h2 style="margin-bottom: 0.2em;">Przykłady konfiguracji</h2>
+        <div class="two-col" style="gap: 0.6em;">
+          <div>
+            <p style="margin: 0 0 0.15em; font-size: 0.6em; color: var(--accent-light); font-weight: 600;">.github/agents/angular-reviewer.agent.md</p>
+            <pre><code data-trim data-noescape class="language-yaml" style="font-size: 0.55em;">
+---
+name: angular-reviewer
+description: 'Reviews Angular code for
+  best practices and performance'
+tools: ['read', 'search']
+model: claude-sonnet-4-5
+---
+
+You are a Senior Angular Reviewer.
+Focus on:
+- OnPush strategy and Signals usage
+- Proper inject() instead of constructor DI
+- Memory leaks in RxJS subscriptions
+- Standalone components without NgModule
+Do NOT modify code, only report issues.
+            </code></pre>
+          </div>
+          <div>
+            <p style="margin: 0 0 0.15em; font-size: 0.6em; color: var(--accent-light); font-weight: 600;">.github/prompts/gen-test.prompt.md</p>
+            <pre><code data-trim data-noescape class="language-yaml" style="font-size: 0.55em;">
+---
+agent: 'agent'
+description: 'Generate unit tests for
+  Angular components and services'
+---
+
+## Task
+Analyze the selected code and generate
+focused unit tests.
+
+## Requirements
+- Use Jest with Angular TestBed
+- Follow AAA pattern (Arrange, Act, Assert)
+- Mock dependencies via inject()
+- Test edge cases: null, empty, HTTP 500
+
+Target: ${input:target:Component or service?}
+            </code></pre>
+          </div>
+        </div>
+        <div class="highlight-box" style="margin-top: 0.25em; padding: 0.25em 0.8em;">
+          <p style="margin: 0; text-align: center; font-size: 0.62em;">Agent: wybierz z dropdown → działa przez cały workflow &nbsp;|&nbsp; Prompt: wywołaj <code>/gen-test</code> w czacie</p>
+        </div>
+        <aside class="notes">
+          Zobaczmy konkretne przykłady. Po lewej mamy Custom Agenta – angular-reviewer.agent.md. W nagłówku YAML definiujemy nazwę, opis, dostępne narzędzia i model AI. Ten agent ma dostęp tylko do odczytu i wyszukiwania – nie może modyfikować kodu, co jest idealne do code review. W treści Markdown opisujemy jego specjalizację: sprawdzanie strategii OnPush, użycia Signals, potencjalnych wycieków pamięci w RxJS i wzorca Standalone. Po prawej mamy Prompt File – gen-test.prompt.md. To wielorazowy szablon do generowania testów. Zmienna ${input:target} pozwala użytkownikowi podać nazwę komponentu lub serwisu przy każdym wywołaniu. Kluczowa różnica: agenta wybieramy z dropdown menu i działa on przez cały workflow – utrzymuje kontekst między kolejnymi krokami. Prompt file wywołujemy jednorazowo przez slash-command /gen-test w czacie. Oba formaty bazują na Markdown z nagłówkiem YAML, więc łatwo je tworzyć i wersjonować. Oficjalna dokumentacja GitHub oferuje bibliotekę gotowych przykładów – zarówno agentów jak i prompt files – które można dostosować do swoich potrzeb.
+        </aside>
+      </section>
+
+      <!-- SLIDE 14: MCP -->
       <section data-background-gradient="radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a14 100%)">
         <p class="section-label">Rozszerzalność</p>
         <h2>Model Context Protocol (MCP)</h2>
