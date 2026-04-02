@@ -30,13 +30,13 @@
     }
 
     .reveal h1 { font-size: 2.4em; }
-    .reveal h2 { font-size: 1.6em; margin-bottom: 0.6em; }
-    .reveal h3 { font-size: 1.1em; color: var(--accent-light); }
+    .reveal h2 { font-size: 1.5em; margin-bottom: 0.3em; }
+    .reveal h3 { font-size: 1.05em; color: var(--accent-light); }
 
     .reveal p, .reveal li {
       font-weight: 300;
-      line-height: 1.6;
-      font-size: 0.85em;
+      line-height: 1.35;
+      font-size: 0.8em;
     }
 
     .reveal ul { list-style: none; padding-left: 0; }
@@ -44,7 +44,7 @@
     .reveal ul li {
       position: relative;
       padding-left: 1.4em;
-      margin-bottom: 0.5em;
+      margin-bottom: 0.25em;
     }
 
     .reveal ul li::before {
@@ -67,10 +67,10 @@
     .reveal pre code {
       background: rgba(0,0,0,0.4);
       color: #e2e8f0;
-      padding: 1em;
+      padding: 0.6em;
       border-radius: 8px;
-      font-size: 0.7em;
-      line-height: 1.5;
+      font-size: 0.65em;
+      line-height: 1.4;
       border-left: 3px solid var(--accent);
     }
 
@@ -105,14 +105,14 @@
     .two-col {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 2em;
+      gap: 1em;
       text-align: left;
     }
 
     .three-col {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
-      gap: 1em;
+      gap: 0.7em;
       text-align: left;
     }
 
@@ -120,31 +120,32 @@
       background: var(--bg-card);
       border: 1px solid rgba(255,255,255,0.08);
       border-radius: 12px;
-      padding: 0.8em 1em;
+      padding: 0.5em 0.7em;
     }
 
     .card h3 {
       margin-top: 0;
-      margin-bottom: 0.25em;
-      font-size: 0.95em;
+      margin-bottom: 0.15em;
+      font-size: 0.88em;
     }
 
     .card p, .card li {
-      font-size: 0.72em;
+      font-size: 0.65em;
       color: var(--text-muted);
+      line-height: 1.3;
     }
 
     .highlight-box {
       background: linear-gradient(135deg, rgba(221,0,49,0.1), rgba(255,64,129,0.05));
       border: 1px solid rgba(221,0,49,0.3);
       border-radius: 12px;
-      padding: 1em 1.5em;
-      margin: 0.8em 0;
+      padding: 0.5em 1em;
+      margin: 0.4em 0;
     }
 
     .emoji-icon {
-      font-size: 1.2em;
-      margin-bottom: 0.15em;
+      font-size: 1em;
+      margin-bottom: 0.1em;
       display: block;
     }
 
@@ -155,12 +156,12 @@
     }
 
     .section-label {
-      font-size: 0.6em;
+      font-size: 0.55em;
       text-transform: uppercase;
       letter-spacing: 0.15em;
       color: var(--accent);
       font-weight: 600;
-      margin-bottom: 0.3em;
+      margin-bottom: 0.1em;
     }
 
     .reveal .progress span {
@@ -179,11 +180,11 @@
     .reveal blockquote {
       background: var(--bg-card);
       border-left: 4px solid var(--accent);
-      padding: 0.8em 1.2em;
+      padding: 0.5em 1em;
       font-style: italic;
       width: auto;
-      margin: 1em auto;
-      font-size: 0.85em;
+      margin: 0.5em auto;
+      font-size: 0.8em;
     }
 
     .tag {
@@ -255,7 +256,7 @@
       <section data-background-gradient="radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a14 100%)">
         <p class="section-label">Eksperci domenowi</p>
         <h2>Uczestnicy czatu <code>@</code></h2>
-        <p class="key-point" style="margin-bottom: 1em;">Nie pytaj „wszystkich" — pytaj specjalistów</p>
+        <p class="key-point" style="margin-bottom: 0.5em;">Nie pytaj „wszystkich" — pytaj specjalistów</p>
         <div class="three-col">
           <div class="card">
             <h3>@workspace</h3>
@@ -295,7 +296,7 @@
             </ul>
           </div>
         </div>
-        <div class="highlight-box" style="margin-top: 1em;">
+        <div class="highlight-box" style="margin-top: 0.5em;">
           <p style="margin: 0; text-align: center;">Przykład: <code>Stwórz test jednostkowy na podstawie #file:user.service.ts</code></p>
         </div>
         <aside class="notes">
@@ -416,23 +417,23 @@ this.count.update(v => v + 1);
       <!-- SLIDE 10: ToT i CoVe -->
       <section data-background-gradient="radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a14 100%)">
         <p class="section-label">Autokorekta i jakość</p>
-        <h2 style="margin-bottom: 0.3em;">Tree of Thought i Chain of Verification</h2>
-        <div class="two-col" style="gap: 1.5em;">
+        <h2 style="margin-bottom: 0.2em;">Tree of Thought i Chain of Verification</h2>
+        <div class="two-col" style="gap: 1em;">
           <div>
-            <ul style="font-size: 0.82em;">
+            <ul style="font-size: 0.78em;">
               <li><strong>Tree of Thought</strong> — wygeneruj kilka alternatywnych podejść i uzasadnij wybór najlepszego</li>
               <li><strong>Self-Refine</strong> — poproś model o sprawdzenie własnego kodu, np. pod kątem wycieków pamięci w RxJS</li>
               <li><strong>Chain of Verification</strong> — model generuje odpowiedź, a następnie tworzy listę kontrolną zgodności z API frameworka</li>
             </ul>
           </div>
           <div>
-            <div class="highlight-box" style="padding: 0.7em 1em;">
-              <p style="margin: 0; font-size: 0.72em;"><strong>Przykład ToT:</strong></p>
-              <p style="margin: 0.3em 0 0; font-size: 0.65em; font-style: italic;">„Zaproponuj 3 podejścia do zarządzania stanem: NGRX, Component Store i Signals. Porównaj trade-offy i uzasadnij rekomendację."</p>
+            <div class="highlight-box" style="padding: 0.4em 0.8em;">
+              <p style="margin: 0; font-size: 0.68em;"><strong>Przykład ToT:</strong></p>
+              <p style="margin: 0.2em 0 0; font-size: 0.6em; font-style: italic;">„Zaproponuj 3 podejścia do zarządzania stanem: NGRX, Component Store i Signals. Porównaj trade-offy i uzasadnij rekomendację."</p>
             </div>
-            <div class="highlight-box" style="margin-top: 0.6em; padding: 0.7em 1em;">
-              <p style="margin: 0; font-size: 0.72em;"><strong>Przykład CoVe:</strong></p>
-              <p style="margin: 0.3em 0 0; font-size: 0.65em; font-style: italic;">„Wygeneruj odpowiedź, a potem zweryfikuj, czy użyte API Angulara jest kompatybilne z wersją 19+."</p>
+            <div class="highlight-box" style="margin-top: 0.4em; padding: 0.4em 0.8em;">
+              <p style="margin: 0; font-size: 0.68em;"><strong>Przykład CoVe:</strong></p>
+              <p style="margin: 0.2em 0 0; font-size: 0.6em; font-style: italic;">„Wygeneruj odpowiedź, a potem zweryfikuj, czy użyte API Angulara jest kompatybilne z wersją 19+."</p>
             </div>
           </div>
         </div>
@@ -480,8 +481,8 @@ this.count.update(v => v + 1);
           <li><strong>Context Bridge</strong> — dynamiczne dostarczanie wiedzy spoza danych treningowych modelu</li>
           <li><strong>Wewnętrzne biblioteki</strong> — Copilot poznaje komponenty i API, których nie ma w publicznym internecie</li>
         </ul>
-        <div class="highlight-box" style="margin-top: 1em;">
-          <p style="margin: 0; text-align: center; font-size: 0.8em;">MCP = most między Copilotem a Twoją wewnętrzną dokumentacją</p>
+        <div class="highlight-box" style="margin-top: 0.5em;">
+          <p style="margin: 0; text-align: center; font-size: 0.75em;">MCP = most między Copilotem a Twoją wewnętrzną dokumentacją</p>
         </div>
         <aside class="notes">
           Model Context Protocol to sposób na rozszerzenie wiedzy Copilota o nasze wewnętrzne zasoby. Możemy połączyć go ze Storybookiem, dokumentacją w Confluence, specyfikacją API w Swaggerze czy z naszymi wewnętrznymi bibliotekami komponentów. MCP działa jak most kontekstowy – dynamicznie dostarcza informacje, których model nie miał w trakcie treningu. W praktyce oznacza to, że Copilot może znać nasze własne komponenty UI, wewnętrzne API i standardy architektoniczne. To kluczowe w środowiskach korporacyjnych, gdzie większość wiedzy jest wewnętrzna i niedostępna publicznie.
@@ -492,25 +493,25 @@ this.count.update(v => v + 1);
       <section data-background-gradient="radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a14 100%)">
         <p class="section-label">Wybór silnika</p>
         <h2>Porównanie modeli AI w Copilot</h2>
-        <div class="three-col" style="font-size: 0.75em; gap: 1em;">
-          <div class="card" style="padding: 0.8em;">
-            <h3 style="margin-bottom: 0.3em;">Rozumowanie</h3>
+        <div class="three-col" style="font-size: 0.72em; gap: 0.7em;">
+          <div class="card" style="padding: 0.5em 0.6em;">
+            <h3 style="margin-bottom: 0.2em;">Rozumowanie</h3>
             <ul style="margin: 0;">
               <li><strong>Claude Sonnet 4.6</strong> — refaktoryzacja, logika biznesowa, testy</li>
               <li><strong>Claude Opus 4.6</strong> — najgłębsza analiza, złożone zadania</li>
               <li><strong>GPT-5.4</strong> — rozumowanie na najwyższym poziomie</li>
             </ul>
           </div>
-          <div class="card" style="padding: 0.8em;">
-            <h3 style="margin-bottom: 0.3em;">Szybkość</h3>
+          <div class="card" style="padding: 0.5em 0.6em;">
+            <h3 style="margin-bottom: 0.2em;">Szybkość</h3>
             <ul style="margin: 0;">
               <li><strong>GPT-5 mini</strong> — szybkie pytania, boilerplate (0 premium)</li>
               <li><strong>Claude Haiku 4.5</strong> — lekki model, niski koszt</li>
               <li><strong>Grok Code Fast 1</strong> — najniższe opóźnienie</li>
             </ul>
           </div>
-          <div class="card" style="padding: 0.8em;">
-            <h3 style="margin-bottom: 0.3em;">Kod</h3>
+          <div class="card" style="padding: 0.5em 0.6em;">
+            <h3 style="margin-bottom: 0.2em;">Kod</h3>
             <ul style="margin: 0;">
               <li><strong>GPT-5.3-Codex</strong> — zoptymalizowany pod generowanie kodu</li>
               <li><strong>Gemini 2.5 Pro</strong> — multimodalne wejście</li>
@@ -518,7 +519,6 @@ this.count.update(v => v + 1);
             </ul>
           </div>
         </div>
-        <p class="key-point" style="margin-top: 0.6em; font-size: 0.8em !important;">Copilot Auto automatycznie dobiera model — lub wybierz ręcznie</p>
         <aside class="notes">
           Copilot w 2026 wspiera kilkanaście modeli AI od różnych dostawców. W kategorii rozumowania mamy Claude Sonnet 4.6, który świetnie radzi sobie z refaktoryzacją, logiką biznesową i testami. Claude Opus 4.6 to najmocniejszy model – idealny do najzłożniejszych zadań, ale droższy w użyciu. GPT-5.4 od OpenAI to ich flagowy model z silnym rozumowaniem. Jeśli zależy nam na szybkości, GPT-5 mini jest darmowy w ramach premium requestów i idealny do prostych pytań. Claude Haiku 4.5 to lekki model Anthropica, a Grok Code Fast 1 od xAI oferuje najniższe opóźnienie. Do generowania kodu mamy dedykowane modele Codex – GPT-5.3-Codex jest zoptymalizowany pod pisanie i edycję kodu. Gemini 2.5 Pro od Google potrafi analizować obrazy i kod jednocześnie. Ważna rzecz: Copilot ma tryb Auto, który sam dobiera najlepszy model do zadania. Ale zawsze możemy wybrać model ręcznie, jeśli wiemy, czego potrzebujemy.
         </aside>
@@ -602,7 +602,6 @@ this.count.update(v => v + 1);
             <li><strong>Weryfikacja zawsze</strong> — AI pomaga, ale odpowiedzialność za kod jest nasza</li>
           </ul>
         </div>
-        <p style="margin-top: 0.8em; font-size: 1.2em;">Dziękuję — pytania?</p>
         <aside class="notes">
           Podsumowując: GitHub Copilot to już nie tylko autouzupełnianie kodu. To pełnoprawny asystent programisty, który rozumie kontekst projektu, wspiera nowoczesne wzorce Angulara i potrafi autonomicznie realizować złożone zadania. Trzy tryby pracy – Ask, Edit i Agent – pokrywają cały cykl programowania. Kluczem do efektywnej pracy jest precyzyjne wskazywanie kontekstu przez @ i # oraz stosowanie zaawansowanych technik promptingu. Custom Instructions i MCP pozwalają dostosować Copilota do potrzeb zespołu. Ale najważniejsze: AI pomaga, lecz to my odpowiadamy za jakość i poprawność kodu. Weryfikacja to obowiązek, nie opcja. Dziękuję za uwagę – jestem otwarty na pytania!
         </aside>
